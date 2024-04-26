@@ -8,6 +8,8 @@ import 'package:miel_work_shift_web/models/plan.dart';
 import 'package:miel_work_shift_web/models/user.dart';
 import 'package:miel_work_shift_web/providers/home.dart';
 import 'package:miel_work_shift_web/providers/login.dart';
+import 'package:miel_work_shift_web/screens/plan_shift_add.dart';
+import 'package:miel_work_shift_web/screens/plan_shift_mod.dart';
 import 'package:miel_work_shift_web/services/category.dart';
 import 'package:miel_work_shift_web/services/plan.dart';
 import 'package:miel_work_shift_web/services/plan_shift.dart';
@@ -61,32 +63,32 @@ class _PlanShiftScreenState extends State<PlanShiftScreen> {
             ),
           );
         } else if (type == 'planShift') {
-          // Navigator.push(
-          //   context,
-          //   FluentPageRoute(
-          //     builder: (context) => PlanShiftModScreen(
-          //       loginProvider: widget.loginProvider,
-          //       homeProvider: widget.homeProvider,
-          //       planShiftId: '${appointmentDetails.id}',
-          //     ),
-          //   ),
-          // );
+          Navigator.push(
+            context,
+            FluentPageRoute(
+              builder: (context) => PlanShiftModScreen(
+                loginProvider: widget.loginProvider,
+                homeProvider: widget.homeProvider,
+                planShiftId: '${appointmentDetails.id}',
+              ),
+            ),
+          );
         }
         break;
       case sfc.CalendarElement.calendarCell:
         final userId = details.resource?.id;
         if (userId == null) return;
-        // Navigator.push(
-        //   context,
-        //   FluentPageRoute(
-        //     builder: (context) => PlanShiftAddScreen(
-        //       loginProvider: widget.loginProvider,
-        //       homeProvider: widget.homeProvider,
-        //       userId: '$userId',
-        //       date: details.date ?? DateTime.now(),
-        //     ),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          FluentPageRoute(
+            builder: (context) => PlanShiftAddScreen(
+              loginProvider: widget.loginProvider,
+              homeProvider: widget.homeProvider,
+              userId: '$userId',
+              date: details.date ?? DateTime.now(),
+            ),
+          ),
+        );
         break;
       default:
         break;

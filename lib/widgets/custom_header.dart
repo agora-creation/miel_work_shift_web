@@ -1,10 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:miel_work_shift_web/common/functions.dart';
 import 'package:miel_work_shift_web/common/style.dart';
 import 'package:miel_work_shift_web/models/organization_group.dart';
 import 'package:miel_work_shift_web/providers/home.dart';
 import 'package:miel_work_shift_web/providers/login.dart';
 import 'package:miel_work_shift_web/screens/login.dart';
 import 'package:miel_work_shift_web/widgets/custom_button_sm.dart';
+import 'package:miel_work_shift_web/widgets/custom_text_box.dart';
 
 class CustomHeader extends StatefulWidget {
   final LoginProvider loginProvider;
@@ -89,8 +91,13 @@ class _CustomHeaderState extends State<CustomHeader> {
                 icon: FluentIcons.password_field,
                 labelText: 'パスワード変更',
                 labelColor: kWhiteColor,
-                backgroundColor: kGreyColor,
-                onPressed: () {},
+                backgroundColor: kOrangeColor,
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => ModPasswordDialog(
+                    loginProvider: widget.loginProvider,
+                  ),
+                ),
               ),
               const SizedBox(width: 4),
               CustomButtonSm(
@@ -109,6 +116,81 @@ class _CustomHeaderState extends State<CustomHeader> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class ModPasswordDialog extends StatefulWidget {
+  final LoginProvider loginProvider;
+
+  const ModPasswordDialog({
+    required this.loginProvider,
+    super.key,
+  });
+
+  @override
+  State<ModPasswordDialog> createState() => _ModPasswordDialogState();
+}
+
+class _ModPasswordDialogState extends State<ModPasswordDialog> {
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.text =
+        widget.loginProvider.organization?.shiftPassword ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InfoLabel(
+              label: 'パスワード',
+              child: CustomTextBox(
+                controller: passwordController,
+                placeholder: '',
+                keyboardType: TextInputType.visiblePassword,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        CustomButtonSm(
+          labelText: 'キャンセル',
+          labelColor: kWhiteColor,
+          backgroundColor: kGreyColor,
+          onPressed: () => Navigator.pop(context),
+        ),
+        CustomButtonSm(
+          labelText: '入力内容を保存',
+          labelColor: kWhiteColor,
+          backgroundColor: kBlueColor,
+          onPressed: () async {
+            String? error =
+                await widget.loginProvider.organizationShiftPasswordUpdate(
+              organization: widget.loginProvider.organization,
+              shiftPassword: passwordController.text,
+            );
+            if (error != null) {
+              if (!mounted) return;
+              showMessage(context, error, false);
+              return;
+            }
+            await widget.loginProvider.reload();
+            if (!mounted) return;
+            showMessage(context, 'パスワードを変更しました', true);
+            Navigator.pop(context);
+          },
+        ),
+      ],
     );
   }
 }
