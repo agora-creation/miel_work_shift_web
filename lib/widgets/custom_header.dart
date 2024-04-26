@@ -48,7 +48,8 @@ class _CustomHeaderState extends State<CustomHeader> {
         ));
       }
     }
-    return Padding(
+    return Container(
+      color: kWhiteColor,
       padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,6 +85,14 @@ class _CustomHeaderState extends State<CustomHeader> {
           ),
           Row(
             children: [
+              CustomButtonSm(
+                icon: FluentIcons.password_field,
+                labelText: 'パスワード変更',
+                labelColor: kWhiteColor,
+                backgroundColor: kGreyColor,
+                onPressed: () {},
+              ),
+              const SizedBox(width: 4),
               CustomButtonSm(
                 icon: FluentIcons.sign_out,
                 labelText: 'ログイン中',
