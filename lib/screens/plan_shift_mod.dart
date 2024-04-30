@@ -19,11 +19,13 @@ class PlanShiftModScreen extends StatefulWidget {
   final LoginProvider loginProvider;
   final HomeProvider homeProvider;
   final String planShiftId;
+  final DateTime date;
 
   const PlanShiftModScreen({
     required this.loginProvider,
     required this.homeProvider,
     required this.planShiftId,
+    required this.date,
     super.key,
   });
 
@@ -254,6 +256,7 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
                       loginProvider: widget.loginProvider,
                       homeProvider: widget.homeProvider,
                       planShift: planShift,
+                      date: widget.date,
                     ),
                   ),
                 ),
@@ -270,11 +273,13 @@ class DelPlanShiftDialog extends StatefulWidget {
   final LoginProvider loginProvider;
   final HomeProvider homeProvider;
   final PlanShiftModel? planShift;
+  final DateTime date;
 
   const DelPlanShiftDialog({
     required this.loginProvider,
     required this.homeProvider,
     required this.planShift,
+    required this.date,
     super.key,
   });
 
@@ -346,6 +351,7 @@ class _DelPlanShiftDialogState extends State<DelPlanShiftDialog> {
             String? error = await planShiftProvider.delete(
               planShift: widget.planShift,
               isAllDelete: isAllDelete,
+              date: widget.date,
             );
             if (error != null) {
               if (!mounted) return;

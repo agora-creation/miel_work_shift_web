@@ -70,6 +70,7 @@ class _PlanShiftScreenState extends State<PlanShiftScreen> {
                 loginProvider: widget.loginProvider,
                 homeProvider: widget.homeProvider,
                 planShiftId: '${appointmentDetails.id}',
+                date: details.date ?? DateTime.now(),
               ),
             ),
           );

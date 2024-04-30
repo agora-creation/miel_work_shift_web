@@ -91,6 +91,7 @@ class PlanShiftProvider with ChangeNotifier {
   Future<String?> delete({
     required PlanShiftModel? planShift,
     required bool isAllDelete,
+    required DateTime date,
   }) async {
     String? error;
     if (planShift == null) return '勤務予定の削除に失敗しました';
@@ -101,8 +102,60 @@ class PlanShiftProvider with ChangeNotifier {
             'id': planShift.id,
           });
         } else {
-          //更新
-          //登録
+          //一旦区切り更新
+          DateTime repeatUntil = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            23,
+            59,
+            59,
+          );
+          repeatUntil.subtract(const Duration(days: 1));
+          _planShiftService.update({
+            'id': planShift.id,
+            'repeatUntil': repeatUntil,
+          });
+          //一旦区切り登録
+          String id = _planShiftService.id();
+          DateTime startedAt = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            planShift.startedAt.hour,
+            planShift.startedAt.minute,
+            planShift.startedAt.second,
+          );
+          startedAt.add(const Duration(days: 1));
+          DateTime endedAt = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            planShift.endedAt.hour,
+            planShift.endedAt.minute,
+            planShift.endedAt.second,
+          );
+          endedAt.add(const Duration(days: 1));
+          _planShiftService.create({
+            'id': id,
+            'organizationId': planShift.organizationId,
+            'groupId': planShift.groupId,
+            'userId': planShift.userId,
+            'startedAt': startedAt,
+            'endedAt': endedAt,
+            'allDay': planShift.allDay,
+            'repeat': planShift.repeat,
+            'repeatInterval': planShift.repeatInterval,
+            'repeatEvery': planShift.repeatEvery,
+            'repeatWeeks': planShift.repeatWeeks,
+            'repeatUntil': null,
+            'alertMinute': planShift.alertMinute,
+            'alertedAt': startedAt.subtract(
+              Duration(minutes: planShift.alertMinute),
+            ),
+            'createdAt': DateTime.now(),
+            'expirationAt': startedAt.add(const Duration(days: 365)),
+          });
         }
       } else {
         _planShiftService.delete({
