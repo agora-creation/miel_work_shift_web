@@ -27,12 +27,12 @@ class LoginProvider with ChangeNotifier {
   }
 
   Future<String?> login({
-    required String loginId,
-    required String password,
+    required String shiftLoginId,
+    required String shiftPassword,
   }) async {
     String? error;
-    if (loginId == '') return 'ログインIDを入力してください';
-    if (password == '') return 'パスワードを入力してください';
+    if (shiftLoginId == '') return 'ログインIDを入力してください';
+    if (shiftPassword == '') return 'パスワードを入力してください';
     try {
       _status = AuthStatus.authenticating;
       notifyListeners();
@@ -40,13 +40,13 @@ class LoginProvider with ChangeNotifier {
       _authUser = result?.user;
       OrganizationModel? tmpOrganization =
           await _organizationService.selectData(
-        loginId: loginId,
-        password: password,
+        shiftLoginId: shiftLoginId,
+        shiftPassword: shiftPassword,
       );
       if (tmpOrganization != null) {
         _organization = tmpOrganization;
-        await setPrefsString('loginId', loginId);
-        await setPrefsString('password', password);
+        await setPrefsString('shiftLoginId', shiftLoginId);
+        await setPrefsString('shiftPassword', shiftPassword);
       } else {
         await _auth?.signOut();
         _status = AuthStatus.unauthenticated;
@@ -107,13 +107,13 @@ class LoginProvider with ChangeNotifier {
   }
 
   Future reload() async {
-    String? loginId = await getPrefsString('loginId');
-    String? password = await getPrefsString('password');
-    if (loginId != null && password != null) {
+    String? shiftLoginId = await getPrefsString('shiftLoginId');
+    String? shiftPassword = await getPrefsString('shiftPassword');
+    if (shiftLoginId != null && shiftPassword != null) {
       OrganizationModel? tmpOrganization =
           await _organizationService.selectData(
-        loginId: loginId,
-        password: password,
+        shiftLoginId: shiftLoginId,
+        shiftPassword: shiftPassword,
       );
       if (tmpOrganization != null) {
         _organization = tmpOrganization;
@@ -128,13 +128,13 @@ class LoginProvider with ChangeNotifier {
     } else {
       _authUser = authUser;
       _status = AuthStatus.authenticated;
-      String? loginId = await getPrefsString('loginId');
-      String? password = await getPrefsString('password');
-      if (loginId != null && password != null) {
+      String? shiftLoginId = await getPrefsString('shiftLoginId');
+      String? shiftPassword = await getPrefsString('shiftPassword');
+      if (shiftLoginId != null && shiftPassword != null) {
         OrganizationModel? tmpOrganization =
             await _organizationService.selectData(
-          loginId: loginId,
-          password: password,
+          shiftLoginId: shiftLoginId,
+          shiftPassword: shiftPassword,
         );
         if (tmpOrganization != null) {
           _organization = tmpOrganization;

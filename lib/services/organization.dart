@@ -10,14 +10,14 @@ class OrganizationService {
   }
 
   Future<OrganizationModel?> selectData({
-    required String loginId,
-    required String password,
+    required String shiftLoginId,
+    required String shiftPassword,
   }) async {
     OrganizationModel? ret;
     await firestore
         .collection(collection)
-        .where('shiftLoginId', isEqualTo: loginId)
-        .where('shiftPassword', isEqualTo: password)
+        .where('shiftLoginId', isEqualTo: shiftLoginId)
+        .where('shiftPassword', isEqualTo: shiftPassword)
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {

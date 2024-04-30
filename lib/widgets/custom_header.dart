@@ -102,7 +102,7 @@ class _CustomHeaderState extends State<CustomHeader> {
               const SizedBox(width: 4),
               CustomButtonSm(
                 icon: FluentIcons.sign_out,
-                labelText: 'ログイン中',
+                labelText: 'ログアウト',
                 labelColor: kWhiteColor,
                 backgroundColor: kGreyColor,
                 onPressed: () => showDialog(
@@ -133,14 +133,7 @@ class ModPasswordDialog extends StatefulWidget {
 }
 
 class _ModPasswordDialogState extends State<ModPasswordDialog> {
-  TextEditingController passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    passwordController.text =
-        widget.loginProvider.organization?.shiftPassword ?? '';
-  }
+  TextEditingController shiftPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -153,10 +146,11 @@ class _ModPasswordDialogState extends State<ModPasswordDialog> {
             InfoLabel(
               label: 'パスワード',
               child: CustomTextBox(
-                controller: passwordController,
+                controller: shiftPasswordController,
                 placeholder: '',
                 keyboardType: TextInputType.visiblePassword,
                 maxLines: 1,
+                obscureText: true,
               ),
             ),
           ],
@@ -177,7 +171,7 @@ class _ModPasswordDialogState extends State<ModPasswordDialog> {
             String? error =
                 await widget.loginProvider.organizationShiftPasswordUpdate(
               organization: widget.loginProvider.organization,
-              shiftPassword: passwordController.text,
+              shiftPassword: shiftPasswordController.text,
             );
             if (error != null) {
               if (!mounted) return;

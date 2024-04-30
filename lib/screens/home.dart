@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:miel_work_shift_web/providers/home.dart';
 import 'package:miel_work_shift_web/providers/login.dart';
 import 'package:miel_work_shift_web/screens/plan_shift.dart';
-import 'package:miel_work_shift_web/widgets/animation_background.dart';
 import 'package:miel_work_shift_web/widgets/custom_header.dart';
 import 'package:provider/provider.dart';
 
@@ -24,14 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
         loginProvider: loginProvider,
         homeProvider: homeProvider,
       ),
-      content: Stack(
-        children: [
-          const AnimationBackground(),
-          PlanShiftScreen(
-            loginProvider: loginProvider,
-            homeProvider: homeProvider,
-          ),
-        ],
+      content: PlanShiftScreen(
+        loginProvider: loginProvider,
+        homeProvider: homeProvider,
       ),
     );
   }
