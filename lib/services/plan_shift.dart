@@ -62,7 +62,7 @@ class PlanShiftService {
       String endTimeText = dateText('HH:mm', planShift.endedAt);
       ret.add(sfc.Appointment(
         id: planShift.id,
-        resourceIds: planShift.userIds,
+        resourceIds: [planShift.userId],
         subject: '勤務予定 $startTimeText～$endTimeText',
         startTime: planShift.startedAt,
         endTime: planShift.endedAt,

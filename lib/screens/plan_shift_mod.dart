@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:miel_work_shift_web/common/custom_date_time_picker.dart';
 import 'package:miel_work_shift_web/common/functions.dart';
 import 'package:miel_work_shift_web/common/style.dart';
-import 'package:miel_work_shift_web/models/organization_group.dart';
 import 'package:miel_work_shift_web/models/plan_shift.dart';
 import 'package:miel_work_shift_web/models/user.dart';
 import 'package:miel_work_shift_web/providers/home.dart';
@@ -11,7 +10,6 @@ import 'package:miel_work_shift_web/providers/plan_shift.dart';
 import 'package:miel_work_shift_web/services/plan_shift.dart';
 import 'package:miel_work_shift_web/services/user.dart';
 import 'package:miel_work_shift_web/widgets/custom_button_sm.dart';
-import 'package:miel_work_shift_web/widgets/custom_checkbox.dart';
 import 'package:miel_work_shift_web/widgets/datetime_range_form.dart';
 import 'package:miel_work_shift_web/widgets/link_text.dart';
 import 'package:miel_work_shift_web/widgets/repeat_select_form.dart';
@@ -35,60 +33,38 @@ class PlanShiftModScreen extends StatefulWidget {
 
 class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
   PlanShiftService planShiftService = PlanShiftService();
+  PlanShiftModel? planShift;
   UserService userService = UserService();
-  OrganizationGroupModel? selectedGroup;
-  List<UserModel> users = [];
-  List<String> selectedUserIds = [];
+  UserModel? selectedUser;
   DateTime startedAt = DateTime.now();
   DateTime endedAt = DateTime.now();
   bool allDay = false;
   bool repeat = false;
   String repeatInterval = kRepeatIntervals.first;
-  TextEditingController repeatEveryController = TextEditingController(
-    text: '1',
-  );
   List<String> repeatWeeks = [];
   int alertMinute = 0;
 
   void _init() async {
-    PlanShiftModel? planShift = await planShiftService.selectData(
+    PlanShiftModel? tmpPlanShift = await planShiftService.selectData(
       id: widget.planShiftId,
     );
-    if (planShift == null) {
+    if (tmpPlanShift == null) {
       if (!mounted) return;
       showMessage(context, '勤務予定データの取得に失敗しました', false);
       Navigator.of(context, rootNavigator: true).pop();
       return;
     }
-    for (OrganizationGroupModel group in widget.homeProvider.groups) {
-      if (group.id == planShift.groupId) {
-        selectedGroup = group;
-      }
-    }
-    _groupChange(selectedGroup);
-    selectedUserIds = planShift.userIds;
-    startedAt = planShift.startedAt;
-    endedAt = planShift.endedAt;
-    allDay = planShift.allDay;
-    repeat = planShift.repeat;
-    repeatInterval = planShift.repeatInterval;
-    repeatEveryController.text = planShift.repeatEvery.toString();
-    repeatWeeks = planShift.repeatWeeks;
-    alertMinute = planShift.alertMinute;
-    setState(() {});
-  }
-
-  void _groupChange(OrganizationGroupModel? value) async {
-    selectedGroup = value;
-    if (selectedGroup != null) {
-      users = await userService.selectList(
-        userIds: selectedGroup?.userIds ?? [],
-      );
-    } else {
-      users = await userService.selectList(
-        userIds: widget.loginProvider.organization?.userIds ?? [],
-      );
-    }
+    planShift = tmpPlanShift;
+    selectedUser = await userService.selectDataId(
+      id: tmpPlanShift.userId,
+    );
+    startedAt = tmpPlanShift.startedAt;
+    endedAt = tmpPlanShift.endedAt;
+    allDay = tmpPlanShift.allDay;
+    repeat = tmpPlanShift.repeat;
+    repeatInterval = tmpPlanShift.repeatInterval;
+    repeatWeeks = tmpPlanShift.repeatWeeks;
+    alertMinute = tmpPlanShift.alertMinute;
     setState(() {});
   }
 
@@ -124,22 +100,6 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
   @override
   Widget build(BuildContext context) {
     final planShiftProvider = Provider.of<PlanShiftProvider>(context);
-    List<ComboBoxItem<OrganizationGroupModel>> groupItems = [];
-    if (widget.homeProvider.groups.isNotEmpty) {
-      groupItems.add(const ComboBoxItem(
-        value: null,
-        child: Text(
-          'グループの指定なし',
-          style: TextStyle(color: kGreyColor),
-        ),
-      ));
-      for (OrganizationGroupModel group in widget.homeProvider.groups) {
-        groupItems.add(ComboBoxItem(
-          value: group,
-          child: Text(group.name),
-        ));
-      }
-    }
     return ScaffoldPage(
       padding: EdgeInsets.zero,
       header: Container(
@@ -164,15 +124,11 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
                 onPressed: () async {
                   String? error = await planShiftProvider.update(
                     planShiftId: widget.planShiftId,
-                    organization: widget.loginProvider.organization,
-                    group: selectedGroup,
-                    userIds: selectedUserIds,
                     startedAt: startedAt,
                     endedAt: endedAt,
                     allDay: allDay,
                     repeat: repeat,
                     repeatInterval: repeatInterval,
-                    repeatEvery: int.parse(repeatEveryController.text),
                     repeatWeeks: repeatWeeks,
                     alertMinute: alertMinute,
                   );
@@ -202,49 +158,12 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InfoLabel(
-                  label: '働くスタッフを選択',
-                  child: Column(
-                    children: [
-                      ComboBox<OrganizationGroupModel>(
-                        isExpanded: true,
-                        value: selectedGroup,
-                        items: groupItems,
-                        onChanged: (value) {
-                          selectedUserIds.clear();
-                          _groupChange(value);
-                        },
-                        placeholder: const Text(
-                          'グループの指定なし',
-                          style: TextStyle(color: kGreyColor),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: kGrey300Color),
-                        ),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: users.length,
-                          itemBuilder: (context, index) {
-                            UserModel user = users[index];
-                            return CustomCheckbox(
-                              label: user.name,
-                              checked: selectedUserIds.contains(user.id),
-                              onChanged: (value) {
-                                if (selectedUserIds.contains(user.id)) {
-                                  selectedUserIds.remove(user.id);
-                                } else {
-                                  selectedUserIds.add(user.id);
-                                }
-                                setState(() {});
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                  label: '働くスタッフ',
+                  child: Container(
+                    color: kGrey200Color,
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8),
+                    child: Text(selectedUser?.name ?? ''),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -295,7 +214,6 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
                         repeatInterval = value;
                       });
                     },
-                    everyController: repeatEveryController,
                     weeks: repeatWeeks,
                     weeksOnChanged: (value) {
                       if (repeatWeeks.contains(value)) {
@@ -335,7 +253,7 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
                     builder: (context) => DelPlanShiftDialog(
                       loginProvider: widget.loginProvider,
                       homeProvider: widget.homeProvider,
-                      planShiftId: widget.planShiftId,
+                      planShift: planShift,
                     ),
                   ),
                 ),
@@ -351,12 +269,12 @@ class _PlanShiftModScreenState extends State<PlanShiftModScreen> {
 class DelPlanShiftDialog extends StatefulWidget {
   final LoginProvider loginProvider;
   final HomeProvider homeProvider;
-  final String planShiftId;
+  final PlanShiftModel? planShift;
 
   const DelPlanShiftDialog({
     required this.loginProvider,
     required this.homeProvider,
-    required this.planShiftId,
+    required this.planShift,
     super.key,
   });
 
@@ -365,6 +283,8 @@ class DelPlanShiftDialog extends StatefulWidget {
 }
 
 class _DelPlanShiftDialogState extends State<DelPlanShiftDialog> {
+  bool isAllDelete = false;
+
   @override
   Widget build(BuildContext context) {
     final planShiftProvider = Provider.of<PlanShiftProvider>(context);
@@ -373,13 +293,42 @@ class _DelPlanShiftDialogState extends State<DelPlanShiftDialog> {
         '勤務予定を削除',
         style: TextStyle(fontSize: 18),
       ),
-      content: const SingleChildScrollView(
+      content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(child: Text('本当に削除しますか？')),
-          ],
+          children: widget.planShift?.repeat == true
+              ? [
+                  const Text('以下の削除タイプを選んでください。'),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: RadioButton(
+                      checked: isAllDelete == false,
+                      onChanged: (value) {
+                        setState(() {
+                          isAllDelete = false;
+                        });
+                      },
+                      content: const Text('この勤務予定のみ削除'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: RadioButton(
+                      checked: isAllDelete == true,
+                      onChanged: (value) {
+                        setState(() {
+                          isAllDelete = true;
+                        });
+                      },
+                      content: const Text('すべての繰り返し勤務予定を削除'),
+                    ),
+                  ),
+                ]
+              : [
+                  const Text('この勤務予定を削除しますか？'),
+                ],
         ),
       ),
       actions: [
@@ -395,7 +344,8 @@ class _DelPlanShiftDialogState extends State<DelPlanShiftDialog> {
           backgroundColor: kRedColor,
           onPressed: () async {
             String? error = await planShiftProvider.delete(
-              planShiftId: widget.planShiftId,
+              planShift: widget.planShift,
+              isAllDelete: isAllDelete,
             );
             if (error != null) {
               if (!mounted) return;

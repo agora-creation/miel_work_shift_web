@@ -6,7 +6,6 @@ class RepeatSelectForm extends StatelessWidget {
   final Function(bool?) repeatOnChanged;
   final String interval;
   final Function(String) intervalOnChanged;
-  final TextEditingController everyController;
   final List<String> weeks;
   final Function(String) weeksOnChanged;
 
@@ -15,7 +14,6 @@ class RepeatSelectForm extends StatelessWidget {
     required this.repeatOnChanged,
     required this.interval,
     required this.intervalOnChanged,
-    required this.everyController,
     required this.weeks,
     required this.weeksOnChanged,
     super.key,
@@ -67,37 +65,6 @@ class RepeatSelectForm extends StatelessWidget {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 4),
-                    interval == kRepeatIntervals[0]
-                        ? SizedBox(
-                            width: 100,
-                            child: TextBox(
-                              controller: everyController,
-                              keyboardType: TextInputType.number,
-                              suffix: const Text('日ごと'),
-                            ),
-                          )
-                        : Container(),
-                    interval == kRepeatIntervals[1]
-                        ? SizedBox(
-                            width: 100,
-                            child: TextBox(
-                              controller: everyController,
-                              keyboardType: TextInputType.number,
-                              suffix: const Text('週間ごと'),
-                            ),
-                          )
-                        : Container(),
-                    interval == kRepeatIntervals[2]
-                        ? SizedBox(
-                            width: 100,
-                            child: TextBox(
-                              controller: everyController,
-                              keyboardType: TextInputType.number,
-                              suffix: const Text('ヶ月ごと'),
-                            ),
-                          )
-                        : Container(),
                     const SizedBox(height: 4),
                     interval == kRepeatIntervals[1]
                         ? Row(

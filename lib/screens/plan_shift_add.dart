@@ -42,9 +42,6 @@ class _PlanShiftAddScreenState extends State<PlanShiftAddScreen> {
   bool allDay = false;
   bool repeat = false;
   String repeatInterval = kRepeatIntervals.first;
-  TextEditingController repeatEveryController = TextEditingController(
-    text: '1',
-  );
   List<String> repeatWeeks = [];
   int alertMinute = kAlertMinutes[1];
 
@@ -156,7 +153,6 @@ class _PlanShiftAddScreenState extends State<PlanShiftAddScreen> {
                     allDay: allDay,
                     repeat: repeat,
                     repeatInterval: repeatInterval,
-                    repeatEvery: int.parse(repeatEveryController.text),
                     repeatWeeks: repeatWeeks,
                     alertMinute: alertMinute,
                   );
@@ -279,7 +275,6 @@ class _PlanShiftAddScreenState extends State<PlanShiftAddScreen> {
                         repeatInterval = value;
                       });
                     },
-                    everyController: repeatEveryController,
                     weeks: repeatWeeks,
                     weeksOnChanged: (value) {
                       if (repeatWeeks.contains(value)) {

@@ -58,6 +58,22 @@ class UserService {
     return ret;
   }
 
+  Future<UserModel?> selectDataId({
+    required String id,
+  }) async {
+    UserModel? ret;
+    await firestore
+        .collection(collection)
+        .where('id', isEqualTo: id)
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        ret = UserModel.fromSnapshot(value.docs.first);
+      }
+    });
+    return ret;
+  }
+
   Future<List<UserModel>> selectList({
     required List<String> userIds,
     List<OrganizationGroupModel>? removeGroups,
