@@ -70,6 +70,7 @@ class PlanShiftModel {
   String? getRepeatRule() {
     String? ret;
     if (_repeat) {
+      ret = '';
       if (_repeatInterval == kRepeatIntervals[0]) {
         ret = 'FREQ=DAILY;';
         if (_repeatEvery > 0) {
@@ -98,6 +99,9 @@ class PlanShiftModel {
         if (_repeatEvery > 0) {
           ret += 'INTERVAL=$_repeatEvery;';
         }
+      }
+      if (_repeatUntil != null) {
+        ret += 'UNTIL=${dateText('yyyyMMddTHHmmss', _repeatUntil)}Z;';
       }
     }
     return ret;

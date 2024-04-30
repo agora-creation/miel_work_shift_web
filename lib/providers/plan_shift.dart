@@ -110,8 +110,7 @@ class PlanShiftProvider with ChangeNotifier {
             23,
             59,
             59,
-          );
-          repeatUntil.subtract(const Duration(days: 1));
+          ).subtract(const Duration(days: 1));
           _planShiftService.update({
             'id': planShift.id,
             'repeatUntil': repeatUntil,
@@ -125,8 +124,7 @@ class PlanShiftProvider with ChangeNotifier {
             planShift.startedAt.hour,
             planShift.startedAt.minute,
             planShift.startedAt.second,
-          );
-          startedAt.add(const Duration(days: 1));
+          ).add(const Duration(days: 1));
           DateTime endedAt = DateTime(
             date.year,
             date.month,
@@ -134,8 +132,7 @@ class PlanShiftProvider with ChangeNotifier {
             planShift.endedAt.hour,
             planShift.endedAt.minute,
             planShift.endedAt.second,
-          );
-          endedAt.add(const Duration(days: 1));
+          ).add(const Duration(days: 1));
           _planShiftService.create({
             'id': id,
             'organizationId': planShift.organizationId,
@@ -153,8 +150,8 @@ class PlanShiftProvider with ChangeNotifier {
             'alertedAt': startedAt.subtract(
               Duration(minutes: planShift.alertMinute),
             ),
-            'createdAt': DateTime.now(),
-            'expirationAt': startedAt.add(const Duration(days: 365)),
+            'createdAt': planShift.createdAt,
+            'expirationAt': planShift.expirationAt,
           });
         }
       } else {
