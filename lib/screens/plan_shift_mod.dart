@@ -315,7 +315,9 @@ class _DelPlanShiftDialogState extends State<DelPlanShiftDialog> {
                           isAllDelete = false;
                         });
                       },
-                      content: const Text('この勤務予定のみ削除'),
+                      content: Text(
+                        '${dateText('yyyy年MM月dd日', widget.date)}分の勤務予定のみ削除',
+                      ),
                     ),
                   ),
                   Padding(

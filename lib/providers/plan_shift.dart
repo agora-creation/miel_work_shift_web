@@ -107,9 +107,9 @@ class PlanShiftProvider with ChangeNotifier {
             date.year,
             date.month,
             date.day,
-            23,
-            59,
-            59,
+            0,
+            0,
+            0,
           ).subtract(const Duration(days: 1));
           _planShiftService.update({
             'id': planShift.id,
