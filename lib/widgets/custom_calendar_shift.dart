@@ -29,6 +29,10 @@ class CustomCalendarShift extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
+      appointmentTextStyle: const TextStyle(
+        color: kWhiteColor,
+        fontSize: 12,
+      ),
       cellBorderColor: kGrey600Color,
     );
   }
