@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:miel_work_shift_web/common/functions.dart';
 import 'package:miel_work_shift_web/common/style.dart';
+import 'package:miel_work_shift_web/models/organization_group.dart';
 import 'package:miel_work_shift_web/models/plan_shift.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart' as sfc;
 
@@ -42,35 +43,44 @@ class PlanShiftService {
 
   Stream<QuerySnapshot<Map<String, dynamic>>>? streamList({
     required String? organizationId,
-    required String? groupId,
   }) {
     return FirebaseFirestore.instance
         .collection(collection)
         .where('organizationId', isEqualTo: organizationId ?? 'error')
-        .where('groupId', isEqualTo: groupId != '' ? groupId : null)
         .orderBy('startedAt', descending: true)
         .snapshots();
   }
 
   List<sfc.Appointment> generateListAppointment({
     required QuerySnapshot<Map<String, dynamic>>? data,
+    required OrganizationGroupModel? currentGroup,
   }) {
     List<sfc.Appointment> ret = [];
     for (DocumentSnapshot<Map<String, dynamic>> doc in data!.docs) {
       PlanShiftModel planShift = PlanShiftModel.fromSnapshot(doc);
       String startTimeText = dateText('HH:mm', planShift.startedAt);
       String endTimeText = dateText('HH:mm', planShift.endedAt);
-      ret.add(sfc.Appointment(
-        id: planShift.id,
-        resourceIds: [planShift.userId],
-        subject: '勤務予定 $startTimeText～$endTimeText',
-        startTime: planShift.startedAt,
-        endTime: planShift.endedAt,
-        isAllDay: planShift.allDay,
-        color: kLightBlue800Color,
-        notes: 'planShift',
-        recurrenceRule: planShift.getRepeatRule(),
-      ));
+      bool listIn = false;
+      if (currentGroup == null) {
+        listIn = true;
+      } else {
+        if (currentGroup.id == planShift.groupId || planShift.groupId == '') {
+          listIn = true;
+        }
+      }
+      if (listIn) {
+        ret.add(sfc.Appointment(
+          id: planShift.id,
+          resourceIds: [planShift.userId],
+          subject: '勤務予定 $startTimeText～$endTimeText',
+          startTime: planShift.startedAt,
+          endTime: planShift.endedAt,
+          isAllDay: planShift.allDay,
+          color: kLightBlue800Color,
+          notes: 'planShift',
+          recurrenceRule: planShift.getRepeatRule(),
+        ));
+      }
     }
     return ret;
   }

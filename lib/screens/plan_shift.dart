@@ -138,12 +138,10 @@ class _PlanShiftScreenState extends State<PlanShiftScreen> {
     }
     var stream1 = planService.streamList(
       organizationId: widget.loginProvider.organization?.id,
-      groupId: widget.homeProvider.currentGroup?.id,
       categories: searchCategories,
     );
     var stream2 = planShiftService.streamList(
       organizationId: widget.loginProvider.organization?.id,
-      groupId: widget.homeProvider.currentGroup?.id,
     );
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -186,12 +184,14 @@ class _PlanShiftScreenState extends State<PlanShiftScreen> {
                   if (snapshot.snapshot1.hasData) {
                     source = planService.generateListAppointment(
                       data: snapshot.snapshot1.data,
+                      currentGroup: widget.homeProvider.currentGroup,
                       shift: true,
                     );
                   }
                   if (snapshot.snapshot2.hasData) {
                     source.addAll(planShiftService.generateListAppointment(
                       data: snapshot.snapshot2.data,
+                      currentGroup: widget.homeProvider.currentGroup,
                     ));
                   }
                   return CustomCalendarShift(
